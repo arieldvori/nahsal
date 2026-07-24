@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>דיווח סטטוס חירום</title>
+  <title>דיווח נכסל משוב</title>
   <style>
     * {
       box-sizing: border-box;
@@ -44,7 +44,7 @@
       border: 1px solid #d1d5db;
       border-radius: 8px;
       font-size: 1rem;
-      margin-bottom: 20px;
+      margin-bottom: 16px;
       outline: none;
     }
     input[type="text"]:focus {
@@ -70,9 +70,14 @@
       transform: scale(0.98);
     }
     .btn-green { background-color: #10b981; }
-    .btn-yellow { background-color: #f59e0b; }
-    .btn-red { background-color: #ef4444; }
+    .btn-blue { background-color: #3b82f6; }
+    .btn-gray { background-color: #6b7280; }
     
+    #other-container {
+      display: none;
+      margin-top: 12px;
+    }
+
     .loading {
       opacity: 0.6;
       pointer-events: none;
@@ -90,24 +95,54 @@
 <body>
 
   <div class="card" id="form-card">
-    <h1>🚨 דיווח סטטוס חירום</h1>
+    <h1>📝 דיווח נכסל משוב</h1>
     
     <label for="name">שם מלא:</label>
     <input type="text" id="name" placeholder="הכנס את שמך..." required>
 
     <label>בחר סטטוס:</label>
     <div class="status-buttons">
-      <button class="btn btn-green" onclick="submitStatus('🏠 בבית / מוגן')">🏠 בבית / מוגן</button>
-      <button class="btn btn-yellow" onclick="submitStatus('🛡️ בדרך למרחב מוגן')">🛡️ בדרך למרחב מוגן</button>
-      <button class="btn btn-red" onclick="submitStatus('⚠️ זקוק לעזרה!')">⚠️ זקוק לעזרה!</button>
+      <button class="btn btn-green" onclick="handleStatusClick('🏠 בבית')">🏠 בבית</button>
+      <button class="btn btn-blue" onclick="handleStatusClick('🛡️ בבסיס')">🛡️ בבסיס</button>
+      <button class="btn btn-gray" onclick="toggleOtherInput()">✏️ אחר</button>
+    </div>
+
+    <!-- שדה שיופיע רק אם לוחצים על 'אחר' -->
+    <div id="other-container">
+      <label for="custom-text">פירוט סטטוס אחר:</label>
+      <input type="text" id="custom-text" placeholder="רשום כאן את הסטטוס שלך...">
+      <button class="btn btn-gray" onclick="submitCustomStatus()">שלח דיווח</button>
     </div>
 
     <div id="message"></div>
   </div>
 
   <script>
-    // הוסף כאן את ה-URL מ-Google Apps Script
+    // הדבק כאן את ה-Web App URL המעודכן שלך שעבד
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwWl0rdkfv2kLShATXaeXX0R3ZPQ2T3xlRArnC1SVSf36xK4oXdOxvVQTOqD6tW0x7gcQ/exec';
+
+    function toggleOtherInput() {
+      const container = document.getElementById('other-container');
+      const isVisible = container.style.display === 'block';
+      container.style.display = isVisible ? 'none' : 'block';
+      if (!isVisible) {
+        document.getElementById('custom-text').focus();
+      }
+    }
+
+    function handleStatusClick(status) {
+      document.getElementById('other-container').style.display = 'none';
+      submitStatus(status);
+    }
+
+    function submitCustomStatus() {
+      const customText = document.getElementById('custom-text').value.trim();
+      if (!customText) {
+        alert('אנא הזן פירוט עבור סטטוס "אחר"');
+        return;
+      }
+      submitStatus('אחר: ' + customText);
+    }
 
     async function submitStatus(status) {
       const nameInput = document.getElementById('name');
@@ -127,7 +162,7 @@
       try {
         await fetch(SCRIPT_URL, {
           method: 'POST',
-          mode: 'no-cors', // מעקף CORS עבור Google Apps Script
+          mode: 'no-cors',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ name: name, status: status })
         });
@@ -137,8 +172,12 @@
         messageDiv.innerHTML = '✅ הדיווח נשלח בהצלחה!';
         messageDiv.style.display = 'block';
 
-        // איפוס השדה לאחר 2 שניות
-        setTimeout(() => { nameInput.value = ''; }, 2000);
+        // איפוס הטופס לאחר 2 שניות
+        setTimeout(() => { 
+          nameInput.value = '';
+          document.getElementById('custom-text').value = '';
+          document.getElementById('other-container').style.display = 'none';
+        }, 2000);
 
       } catch (err) {
         card.classList.remove('loading');
