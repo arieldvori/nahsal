@@ -38,7 +38,7 @@
       margin-bottom: 8px;
       color: #374151;
     }
-    input[type="text"], select {
+    input[type="text"], input[type="number"] {
       width: 100%;
       padding: 12px;
       border: 1px solid #d1d5db;
@@ -48,7 +48,7 @@
       outline: none;
       background-color: white;
     }
-    input[type="text"]:focus, select:focus {
+    input[type="text"]:focus, input[type="number"]:focus {
       border-color: #2563eb;
     }
     .status-buttons {
@@ -98,14 +98,8 @@
   <div class="card" id="form-card">
     <h1>📝 דיווח נכסל משוב</h1>
     
-    <label for="squad">חוליה:</label>
-    <select id="squad">
-      <option value="" disabled selected>בחר חוליה...</option>
-      <option value="חוליה א'">חוליה א'</option>
-      <option value="חוליה ב'">חוליה ב'</option>
-      <option value="חוליה ג'">חוליה ג'</option>
-      <option value="מפקדה">מפקדה</option>
-    </select>
+    <label for="squad">מספר חוליה:</label>
+    <input type="number" id="squad" placeholder="הכנס מספר חוליה..." required min="1">
 
     <label for="name">שם מלא:</label>
     <input type="text" id="name" placeholder="הכנס את שמך..." required>
@@ -128,7 +122,7 @@
   </div>
 
   <script>
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxULhIpeMLA_PUVG1aJMDrKXeh8SRMXZIJxFvbRmwUio97rg93H6oyl-_XMzXt6419wVQ/exec'; // הדבק כאן את ה-URL המעודכן מ-Apps Script
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyImN9CXKnQsf3cqNGXdIyzZtqXUyVaW7OMhuj5-EEdfywrEeMlWvD0U_CTLd9n2E-VVw/exec'; // הדבק כאן את ה-URL המעודכן מ-Apps Script
 
     function toggleOtherInput() {
       const container = document.getElementById('other-container');
@@ -154,18 +148,18 @@
     }
 
     async function submitStatus(status) {
-      const squadSelect = document.getElementById('squad');
+      const squadInput = document.getElementById('squad');
       const nameInput = document.getElementById('name');
       
-      const squad = squadSelect.value;
+      const squad = squadInput.value.trim();
       const name = nameInput.value.trim();
       
       const messageDiv = document.getElementById('message');
       const card = document.getElementById('form-card');
 
       if (!squad) {
-        alert('אנא בחר חוליה מהרשימה');
-        squadSelect.focus();
+        alert('אנא הזן מספר חוליה');
+        squadInput.focus();
         return;
       }
 
