@@ -38,7 +38,7 @@
       margin-bottom: 8px;
       color: #374151;
     }
-    input[type="text"] {
+    input[type="text"], select {
       width: 100%;
       padding: 12px;
       border: 1px solid #d1d5db;
@@ -46,8 +46,9 @@
       font-size: 1rem;
       margin-bottom: 16px;
       outline: none;
+      background-color: white;
     }
-    input[type="text"]:focus {
+    input[type="text"]:focus, select:focus {
       border-color: #2563eb;
     }
     .status-buttons {
@@ -97,6 +98,15 @@
   <div class="card" id="form-card">
     <h1>📝 דיווח נכסל משוב</h1>
     
+    <label for="squad">חוליה:</label>
+    <select id="squad">
+      <option value="" disabled selected>בחר חוליה...</option>
+      <option value="חוליה א'">חוליה א'</option>
+      <option value="חוליה ב'">חוליה ב'</option>
+      <option value="חוליה ג'">חוליה ג'</option>
+      <option value="מפקדה">מפקדה</option>
+    </select>
+
     <label for="name">שם מלא:</label>
     <input type="text" id="name" placeholder="הכנס את שמך..." required>
 
@@ -111,15 +121,14 @@
     <div id="other-container">
       <label for="custom-text">פירוט סטטוס אחר:</label>
       <input type="text" id="custom-text" placeholder="רשום כאן את הסטטוס שלך...">
-      <button class="btn btn-green" onclick="submitCustomStatus()">שלח דיווח</button>
+      <button class="btn btn-gray" onclick="submitCustomStatus()">שלח דיווח</button>
     </div>
 
     <div id="message"></div>
   </div>
 
   <script>
-    // הדבק כאן את ה-Web App URL המעודכן שלך שעבד
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzg3qSXzeXnfhJBR5QiClWfL5GEMbqiJuHbvAr8g93wu7eABGAmOJgY20DH6TJy6-exuA/exec';
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxULhIpeMLA_PUVG1aJMDrKXeh8SRMXZIJxFvbRmwUio97rg93H6oyl-_XMzXt6419wVQ/exec'; // הדבק כאן את ה-URL המעודכן מ-Apps Script
 
     function toggleOtherInput() {
       const container = document.getElementById('other-container');
@@ -141,14 +150,24 @@
         alert('אנא הזן פירוט עבור סטטוס "אחר"');
         return;
       }
-      submitStatus(customText);
+      submitStatus('אחר: ' + customText);
     }
 
     async function submitStatus(status) {
+      const squadSelect = document.getElementById('squad');
       const nameInput = document.getElementById('name');
+      
+      const squad = squadSelect.value;
       const name = nameInput.value.trim();
+      
       const messageDiv = document.getElementById('message');
       const card = document.getElementById('form-card');
+
+      if (!squad) {
+        alert('אנא בחר חוליה מהרשימה');
+        squadSelect.focus();
+        return;
+      }
 
       if (!name) {
         alert('אנא הזן את שמך לפני לחיצה על הסטטוס');
@@ -164,7 +183,7 @@
           method: 'POST',
           mode: 'no-cors',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name: name, status: status })
+          body: JSON.stringify({ squad: squad, name: name, status: status })
         });
 
         card.classList.remove('loading');
