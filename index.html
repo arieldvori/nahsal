@@ -38,7 +38,7 @@
       margin-bottom: 8px;
       color: #374151;
     }
-    input[type="text"], input[type="number"] {
+    input[type="text"] {
       width: 100%;
       padding: 12px;
       border: 1px solid #d1d5db;
@@ -48,7 +48,7 @@
       outline: none;
       background-color: white;
     }
-    input[type="text"]:focus, input[type="number"]:focus {
+    input[type="text"]:focus {
       border-color: #2563eb;
     }
     .status-buttons {
@@ -98,11 +98,11 @@
   <div class="card" id="form-card">
     <h1>📝 דיווח נכסל משוב</h1>
     
-    <label for="squad">מספר חוליה:</label>
-    <input type="number" id="squad" placeholder="הכנס מספר חוליה..." required min="1">
-
     <label for="name">שם מלא:</label>
     <input type="text" id="name" placeholder="הכנס את שמך..." required>
+
+    <label for="squad">חוליה:</label>
+    <input type="text" id="squad" placeholder="הכנס מספר/שם חוליה..." required>
 
     <label>בחר סטטוס:</label>
     <div class="status-buttons">
@@ -148,24 +148,24 @@
     }
 
     async function submitStatus(status) {
-      const squadInput = document.getElementById('squad');
       const nameInput = document.getElementById('name');
+      const squadInput = document.getElementById('squad');
       
-      const squad = squadInput.value.trim();
       const name = nameInput.value.trim();
+      const squad = squadInput.value.trim();
       
       const messageDiv = document.getElementById('message');
       const card = document.getElementById('form-card');
 
-      if (!squad) {
-        alert('אנא הזן מספר חוליה');
-        squadInput.focus();
+      if (!name) {
+        alert('אנא הזן שם מלא');
+        nameInput.focus();
         return;
       }
 
-      if (!name) {
-        alert('אנא הזן את שמך לפני לחיצה על הסטטוס');
-        nameInput.focus();
+      if (!squad) {
+        alert('אנא הזן חוליה');
+        squadInput.focus();
         return;
       }
 
@@ -177,7 +177,7 @@
           method: 'POST',
           mode: 'no-cors',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ squad: squad, name: name, status: status })
+          body: JSON.stringify({ name: name, squad: squad, status: status })
         });
 
         card.classList.remove('loading');
@@ -188,6 +188,7 @@
         // איפוס הטופס לאחר 2 שניות
         setTimeout(() => { 
           nameInput.value = '';
+          squadInput.value = '';
           document.getElementById('custom-text').value = '';
           document.getElementById('other-container').style.display = 'none';
         }, 2000);
